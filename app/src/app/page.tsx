@@ -1,0 +1,20 @@
+import { auth } from "@clerk/nextjs/server";
+import { prisma } from "@/lib/prisma";
+import UserForm from "@/components/UserForm";
+import UserDetail from "@/components/UserDetail";
+
+export default async function Home() {
+  const { userId: clerkId } = await auth();
+
+  let user = null;
+  if (clerkId) {
+    user = await prisma.user.findUnique({ where: { clerkId } });
+  }
+
+  return (
+    <main className="flex min-h-screen flex-col items-center justify-center">
+      <UserForm userData={user} />
+      {user && <UserDetail userData={user} />}
+    </main>
+  );
+}
