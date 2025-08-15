@@ -10,7 +10,7 @@ export async function POST(request: Request) {
     if (!clerkId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const { email, password } = await request.json();
+    const { email, password, whatsappNumber } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -19,14 +19,24 @@ export async function POST(request: Request) {
       );
     }
 
-    const response = await axios.post(
-      "https://student.bennetterp.camu.in/login/validate",
-      {
-        dtype: "M",
-        Email: email,
-        pwd: password,
-      }
-    );
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user) {
+      return NextResponse.json(
+        { message: "User already exists" },
+        { status: 409 }
+      );
+    }
+
+    let waNumber: string | undefined;
+    if (whatsappNumber && whatsappNumber.trim().length === 10) {
+      waNumber = whatsappNumber.trim();
+    }
+
+    const response = await axios.post(process.env.NEXT_PUBLIC_CAMU_LOGIN_URL!, {
+      dtype: "M",
+      Email: email,
+      pwd: password,
+    });
 
     console.log(response.data.output.data.logindetails);
     console.log("Cookie from response:", response.headers["set-cookie"]);
@@ -37,6 +47,7 @@ export async function POST(request: Request) {
         update: {
           email,
           password,
+          whatsappNumber: waNumber,
           userData: response.data.output.data.logindetails,
           stuID: response.data.output.data.logindetails.Student[0].StuID,
           cookie: response.headers["set-cookie"]?.join("; "),
@@ -45,6 +56,7 @@ export async function POST(request: Request) {
           clerkId,
           email,
           password,
+          whatsappNumber,
           userData: response.data.output.data.logindetails,
           stuID: response.data.output.data.logindetails.Student[0].StuID,
           cookie: response.headers["set-cookie"]?.join("; "),

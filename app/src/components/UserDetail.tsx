@@ -1,5 +1,7 @@
+"use client";
 import { Card } from "@/components/ui/card";
 import { User } from "@/generated/prisma";
+import SignOutButton from "./SignOutButton";
 
 export default function UserDetail({ userData }: { userData: User }) {
   const hasData = userData && Object.keys(userData).length > 0;
@@ -12,7 +14,10 @@ export default function UserDetail({ userData }: { userData: User }) {
 
   return (
     <Card className="w-[80%] max-w-80 mx-auto !gap-0 p-6 m-4 border rounded-lg shadow-sm">
-      <h2 className="text-lg font-semibold mb-4">User Details</h2>
+      <div className="flex items-center justify-between">
+        <h2 className="text-lg font-semibold mb-4">User Details</h2>
+        <SignOutButton />
+      </div>
 
       <div className="space-y-3">
         <div>

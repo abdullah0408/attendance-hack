@@ -9,14 +9,18 @@ datasource db {
 }
 
 model User {
-  id       String  @id @default(cuid())
-  clerkId  String  @unique
-  email    String  @unique
-  password String
-  userData Json?   @default("{}")
-  inUse    Boolean @default(false)
-  stuID    String  @unique
-  cookie   String?
+  id              String  @id @default(cuid())
+  clerkId         String  @unique
+  email           String  @unique
+  password        String
+  userData        Json?   @default("{}")
+  inUse           Boolean @default(false)
+  stuID           String  @unique
+  cookie          String?
+  whatsappNumber  String?
+  isAdmin         Boolean @default(false)
+  getNotification Boolean @default(false)
+  allowed         Boolean @default(false)
 
   createdAt DateTime @default(now())
 }

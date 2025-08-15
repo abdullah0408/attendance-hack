@@ -1,5 +1,5 @@
 {
-  "name": "wa-sync",
+  "name": "wa-send-message-bot",
   "module": "index.ts",
   "type": "module",
   "private": true,
@@ -10,9 +10,8 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "axios": "^1.11.0",
     "dotenv": "^17.2.1",
-    "form-data": "^4.0.4",
+    "express": "^5.1.0",
     "venom-bot": "^5.3.0"
   }
 }

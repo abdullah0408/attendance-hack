@@ -1,19 +1,22 @@
+import "dotenv/config";
 import venom from "venom-bot";
 import axios from "axios";
 import FormData from "form-data";
 
-const WEBHOOK_URL = "http://YOUR_SERVER_IP:8080/api/webhooks/wa-sync";
+const WEBHOOK_URL =
+  process.env.WEBHOOK_URL || "http://localhost:3000/api/webhooks/wa-sync";
 
-venom.create({
-  session: "attendance-bot",
-  multidevice: true,
-  headless: "new",
-  useChrome: true,
-  browserPath: '/usr/bin/chromium-browser',
-  executablePath: "/root/.cache/puppeteer/chrome/linux-121.0.6167.85/chrome-linux64/chrome",
-  chromiumArgs: ["--no-sandbox", "--disable-setuid-sandbox"],
-  throwErrorOnTosBlock: false,
-}).then((client) => start(client))
+venom
+  .create({
+    session: "attendance-bot",
+    multidevice: true,
+    headless: "new",
+    useChrome: true,
+    browserPath: "/usr/bin/chromium-browser",
+    chromiumArgs: ["--no-sandbox", "--disable-setuid-sandbox"],
+    throwErrorOnTosBlock: false,
+  })
+  .then((client) => start(client))
   .catch((err) => console.error("❌ Venom error:", err));
 
 function start(client) {
@@ -34,8 +37,13 @@ function start(client) {
           contentType: msg.mimetype,
         });
 
-        await axios.post(WEBHOOK_URL, formData, { headers: formData.getHeaders() });
-        console.log("🌐 Image sent successfully!");
+        const response = await axios.post(WEBHOOK_URL, formData, {
+          headers: formData.getHeaders(),
+        });
+        console.log(
+          "✅ Image sent successfully!",
+          response.data.message || response.data
+        );
       } catch (err) {
         console.error("❌ Failed to send image:", err.message);
       }
