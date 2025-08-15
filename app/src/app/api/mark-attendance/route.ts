@@ -12,6 +12,7 @@ export async function POST(request: Request) {
 
   try {
     const { qrValue } = await request.json();
+    console.log("Received QR value:", qrValue);
 
     if (!qrValue) {
       return NextResponse.json(
