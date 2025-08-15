@@ -19,11 +19,17 @@ export async function POST(request: Request) {
       );
     }
 
+    const user = await prisma.user.findUnique({ where: { email } });
+    if (user) {
+      return NextResponse.json(
+        { message: "User already exists" },
+        { status: 409 }
+      );
+    }
+
     let waNumber: string | undefined;
-    if (!!whatsappNumber) {
-      if (whatsappNumber.length.trim() !== 10) {
-        waNumber = whatsappNumber;
-      }
+    if (whatsappNumber && whatsappNumber.trim().length === 10) {
+      waNumber = whatsappNumber.trim();
     }
 
     const response = await axios.post(process.env.NEXT_PUBLIC_CAMU_LOGIN_URL!, {

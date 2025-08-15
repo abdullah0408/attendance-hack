@@ -51,6 +51,14 @@ export async function markAttendanceForUser(user: User, qrValue: string) {
     }
   } catch (error) {
     console.error(`Error marking attendance for ${user.stuID}:`, error);
-    sendEmail(user.email, "failed");
+    if (user.getNotification) {
+      sendEmail(user.email, "success");
+      if (!!user.whatsappNumber) {
+        sendWaMessage(
+          user.whatsappNumber,
+          `Attendance marked successfully at ${formattedDate}`
+        );
+      }
+    }
   }
 }
