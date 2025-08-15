@@ -14,6 +14,9 @@ export default function UserForm({ userData }: { userData: User | null }) {
   const router = useRouter();
   const [email, setEmail] = useState(userData?.email || "");
   const [password, setPassword] = useState(userData?.password || "");
+  const [whatsappNumber, setWhatsappNumber] = useState(
+    userData?.whatsappNumber || ""
+  );
   const [showPassword, setShowPassword] = useState(false);
   const [verifyLoading, setVerifyLoading] = useState(false);
   const [error, setError] = useState("");
@@ -23,7 +26,15 @@ export default function UserForm({ userData }: { userData: User | null }) {
   const [automateAttendance, setAutomateAttendance] = useState(
     userData?.inUse || false
   );
+  const [getNotification, setGetNotification] = useState(
+    userData?.getNotification || false
+  );
   const [toggleLoading, setToggleLoading] = useState(false);
+  const [notificationToggleLoading, setNotificationToggleLoading] =
+    useState(false);
+  const [notificationToggleError, setNotificationToggleError] = useState("");
+  const [notificationToggleSuccess, setNotificationToggleSuccess] =
+    useState("");
 
   const togglePasswordVisibility = () => setShowPassword(!showPassword);
 
@@ -36,6 +47,7 @@ export default function UserForm({ userData }: { userData: User | null }) {
       const response = await axios.post("/api/camu-credentials", {
         email,
         password,
+        whatsappNumber,
       });
       if (response.data.message === "Correct credentials") {
         setSuccessMessage("Credentials verified successfully!");
@@ -77,6 +89,28 @@ export default function UserForm({ userData }: { userData: User | null }) {
     }
   };
 
+  const handleToggleNotification = async (value: boolean) => {
+    setNotificationToggleLoading(true);
+    setNotificationToggleError("");
+    setNotificationToggleSuccess("");
+    try {
+      await axios.post("/api/toggle-notification", { getNotification: value });
+      setGetNotification(value);
+      setNotificationToggleSuccess(
+        `Notifications ${value ? "enabled" : "disabled"} successfully!`
+      );
+      setTimeout(() => setNotificationToggleSuccess(""), 3000);
+    } catch {
+      setNotificationToggleError(
+        `Failed to ${
+          value ? "enable" : "disable"
+        } notifications. Please try again.`
+      );
+    } finally {
+      setNotificationToggleLoading(false);
+    }
+  };
+
   const isFormValid = useMemo(
     () => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) && password.length > 0,
     [email, password]
@@ -86,7 +120,7 @@ export default function UserForm({ userData }: { userData: User | null }) {
     <div className="w-[80%] max-w-80 mx-auto space-y-4 p-6 m-4 border rounded-lg shadow-sm">
       <h2 className="text-xl font-bold text-center mb-6">CAMU Credentials</h2>
       <div className="space-y-2">
-        <Label htmlFor="email">Bennett University Email</Label>
+        <Label htmlFor="email">Bennett University Email *</Label>
         <Input
           id="email"
           type="email"
@@ -97,7 +131,19 @@ export default function UserForm({ userData }: { userData: User | null }) {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="whatsapp">WhatsApp Number</Label>
+        <Input
+          id="whatsapp"
+          placeholder="Don't enter number with +91"
+          type="text"
+          value={whatsappNumber}
+          onChange={(e) => setWhatsappNumber(e.target.value)}
+          className={error ? "border-red-500" : ""}
+        />
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="password">Password *</Label>
         <div className="relative">
           <Input
             id="password"
@@ -142,6 +188,20 @@ export default function UserForm({ userData }: { userData: User | null }) {
         {toggleError && <p className="text-sm text-red-500">{toggleError}</p>}
         {toggleSuccess && (
           <p className="text-sm text-green-500">{toggleSuccess}</p>
+        )}
+        <div className="flex items-center justify-between">
+          <Label className="text-sm font-medium">Get Notification</Label>
+          <Switch
+            checked={getNotification}
+            onCheckedChange={handleToggleNotification}
+            disabled={!userData || notificationToggleLoading}
+          />
+        </div>
+        {notificationToggleError && (
+          <p className="text-sm text-red-500">{notificationToggleError}</p>
+        )}
+        {notificationToggleSuccess && (
+          <p className="text-sm text-green-500">{notificationToggleSuccess}</p>
         )}
       </div>
     </div>

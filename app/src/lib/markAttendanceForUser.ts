@@ -1,6 +1,9 @@
 import axios from "axios";
 import { sendEmail } from "./sendMail";
 import { User } from "@/generated/prisma";
+import { sendWaMessage } from "./sendWaMessage";
+
+const formattedDate = new Date().toLocaleString();
 
 export async function markAttendanceForUser(user: User, qrValue: string) {
   if (!user.inUse || !user.stuID || !user.cookie) return;
@@ -25,10 +28,26 @@ export async function markAttendanceForUser(user: User, qrValue: string) {
       JSON.stringify(response.data).includes("ATTENDANCE_NOT_VALID")
     ) {
       console.log(`Attendance not valid for ${user.stuID}:`, response.data);
-      sendEmail(user.email, "failed");
+      if (user.getNotification) {
+        sendEmail(user.email, "failed");
+        if (!!user.whatsappNumber) {
+          sendWaMessage(
+            user.whatsappNumber,
+            `Attempt to mark attendance failed at ${formattedDate}`
+          );
+        }
+      }
     } else {
       console.log(`Attendance marked for ${user.stuID}:`, response.data);
-      sendEmail(user.email, "success");
+      if (user.getNotification) {
+        sendEmail(user.email, "success");
+        if (!!user.whatsappNumber) {
+          sendWaMessage(
+            user.whatsappNumber,
+            `Attendance marked successfully at ${formattedDate}`
+          );
+        }
+      }
     }
   } catch (error) {
     console.error(`Error marking attendance for ${user.stuID}:`, error);

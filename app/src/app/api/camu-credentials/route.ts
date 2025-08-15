@@ -10,13 +10,20 @@ export async function POST(request: Request) {
     if (!clerkId) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
-    const { email, password } = await request.json();
+    const { email, password, whatsappNumber } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
         { error: "Email and password are required" },
         { status: 400 }
       );
+    }
+
+    let waNumber: string | undefined;
+    if (!!whatsappNumber) {
+      if (whatsappNumber.length.trim() !== 10) {
+        waNumber = whatsappNumber;
+      }
     }
 
     const response = await axios.post(process.env.NEXT_PUBLIC_CAMU_LOGIN_URL!, {
@@ -34,6 +41,7 @@ export async function POST(request: Request) {
         update: {
           email,
           password,
+          whatsappNumber: waNumber,
           userData: response.data.output.data.logindetails,
           stuID: response.data.output.data.logindetails.Student[0].StuID,
           cookie: response.headers["set-cookie"]?.join("; "),
@@ -42,6 +50,7 @@ export async function POST(request: Request) {
           clerkId,
           email,
           password,
+          whatsappNumber,
           userData: response.data.output.data.logindetails,
           stuID: response.data.output.data.logindetails.Student[0].StuID,
           cookie: response.headers["set-cookie"]?.join("; "),

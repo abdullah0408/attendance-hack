@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     }
 
     const users = await prisma.user.findMany({
-      where: { inUse: true },
+      where: { inUse: true, allowed: true },
       orderBy: {
         createdAt: "asc",
       },

@@ -85,7 +85,7 @@ export async function POST(req: NextRequest) {
     console.log("QR value successfully read:", qrValue);
 
     const users = await prisma.user.findMany({
-      where: { inUse: true },
+      where: { inUse: true, allowed: true },
       orderBy: {
         createdAt: "asc",
       },

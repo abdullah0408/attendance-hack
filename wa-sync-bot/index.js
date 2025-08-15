@@ -1,8 +1,10 @@
+import "dotenv/config";
 import venom from "venom-bot";
 import axios from "axios";
 import FormData from "form-data";
 
-const WEBHOOK_URL = "http://YOUR_SERVER_IP:8080/api/webhooks/wa-sync";
+const WEBHOOK_URL =
+  process.env.WEBHOOK_URL || "http://localhost:3000/api/webhooks/wa-sync";
 
 venom
   .create({
