@@ -19,14 +19,11 @@ export async function POST(request: Request) {
       );
     }
 
-    const response = await axios.post(
-      "https://student.bennetterp.camu.in/login/validate",
-      {
-        dtype: "M",
-        Email: email,
-        pwd: password,
-      }
-    );
+    const response = await axios.post(process.env.NEXT_PUBLIC_CAMU_LOGIN_URL!, {
+      dtype: "M",
+      Email: email,
+      pwd: password,
+    });
 
     console.log(response.data.output.data.logindetails);
     console.log("Cookie from response:", response.headers["set-cookie"]);
